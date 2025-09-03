@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Wireframe + P5 Canvas</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/addons/p5.sound.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <style>
+      .scene { display: none; }
+      .scene.active { display: block; }
+      .scene-toolbar {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(4px);
+        padding: 8px 12px;
+        border-radius: 10px;
+        margin: 12px 0;
+      }
+      .scene-toolbar .spacer { flex: 1; }
+      .nav-buttons { display: inline-flex; gap: 8px; margin-bottom: 8px; }
+      .nav-buttons button {
+        background: #1e1e1e; color:#fff; border:2px solid #fff; border-radius:8px; padding:6px 10px; cursor:pointer;
+      }
+      .nav-buttons button:hover { background:#2a2a2a; }
+
+      .choice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .choice {
+        background: rgba(255,255,255,0.08);
+        border: 2px solid #fff;
+        border-radius: 10px;
+        padding: 14px;
+        cursor: pointer;
+        text-align: left;
+      }
+      .choice:hover { background: rgba(255,255,255,0.14); }
+      .choice h4 { margin: 0 0 6px 0; }
+      .muted { opacity: .8; font-size: .9rem; }
+    </style>
+  </head>
+
+  <body>
+    <div class="nav-buttons" aria-label="Scene Navigation">
+      <button data-goto="intro" title="1">Intro</button>
+      <button data-goto="alley" title="2">Alley</button>
+      <button data-goto="alleyChoice" title="3">Objects</button>
+    </div>
+
+    <div class="scene-toolbar">
+      <div>Current Scene: <strong id="sceneLabel">alley</strong></div>
+      <div class="spacer"></div>
+      <button id="btn-prev" title="←">←</button>
+      <button id="btn-next" title="→">→</button>
+    </div>
+
+    <main id="scene-stage" aria-live="polite" style="width:100%;">
+      <section class="scene" id="scene-intro" data-key="intro" aria-label="Intro">
+        <div class="title">Cipher Alley — Prologue</div>
+        <div class="instructions">
+          You slowly open your eyes again. Head spinning, vision blurred. A note:
+          <em>“Find what was lost.”</em><br/>
+          Press <strong>2</strong> or click <strong>Alley</strong> to begin exploring with the flashlight.
+        </div>
+      </section>
+
+      <section class="scene active" id="scene-alley" data-key="alley" aria-label="Alley">
+        <div class="title">Cipher Alley</div>
+        <div class="instructions">
+          You slowly open your eyes again. Head spinning, vision blurred. You start asking yourself,
+          “Where am I?” You wake up in a dark, eerie, and unfamiliar alleyway with no memory of how you got here...
+        </div>
+
+        <div id="canvas-holder" aria-label="Interactive Canvas"></div>
+
+        <div class="controls">
+          <button id="toggle-sound">What's that sound.</button>
+          <button id="random-circle-color">Circle Color</button>
+          <label for="vol">Volume</label>
+          <input id="vol" type="range" min="0" max="1" step="0.01" value="0.5" />
+          <span id="volVal">0.50</span>
+          <label>Text Size:
+            <input id="text-size" type="range" min="50" max="250" value="100" />
+            <span id="textSizeVal">100</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="scene" id="scene-alleyChoice" data-key="alleyChoice" aria-label="Alley Choice">
+        <div class="title">Frame 2 — Choose Your Object/div>
+        <div class="instructions">
+          Alley, eerie and mysterious background music. Four objects lie within reach.
+          <br/>Click one object to continue:
+        </div>
+
+        <div class="choice-grid">
+          <button class="choice" data-goto="photo" aria-label="Photograph">
+            <h4>Photograph</h4>
+            <div class="muted">Progression → Frame 3.1</div>
+          </button>
+
+          <button class="choice" data-goto="magnifier" aria-label="Magnifying Glass">
+            <h4>Magnifying Glass</h4>
+            <div class="muted">Progression → Frame 3.2</div>
+          </button>
+
+          <button class="choice" data-goto="watch" aria-label="Rustic Pocket Watch">
+            <h4>Rustic Pocket Watch</h4>
+            <div class="muted">Progression → Frame 3.3</div>
+          </button>
+
+          <button class="choice" data-goto="key" aria-label="The Key">
+            <h4>The “Key”</h4>
+            <div class="muted">Progression → Frame 3.4</div>
+          </button>
+        </div>
+      </section>
+
+      <section class="scene" id="scene-photo" data-key="photo" aria-label="Frame 3.1 – Photograph">
+        <div class="title">Frame 3.1 — Photograph</div>
+        <div class="instructions">A water-warped photo reveals half a face and a date scratched on the back.</div>
+      </section>
+
+      <section class="scene" id="scene-magnifier" data-key="magnifier" aria-label="Frame 3.2 – Magnifying Glass">
+        <div class="title">Frame 3.2 — Magnifying Glass</div>
+        <div class="instructions">The cracked lens still focuses light—hidden glyphs brighten along the bricks.</div>
+      </section>
+
+      <section class="scene" id="scene-watch" data-key="watch" aria-label="Frame 3.3 – Rustic Pocket Watch">
+        <div class="title">Frame 3.3 — Rustic Pocket Watch</div>
+        <div class="instructions">Stopped at 11:11. The ticking resumes for a moment when you hold your breath.</div>
+      </section>
+
+      <section class="scene" id="scene-key" data-key="key" aria-label="Frame 3.4 – The Key">
+        <div class="title">Frame 3.4 — The “Key”</div>
+        <div class="instructions">Cold metal. Its teeth match a pattern you saw in the shadows.</div>
+      </section>
+    </main>
+
+    <script src="sketch.js"></script>
+
+<script>
+      (function () {
+        const scenes = ["intro", "alley", "alleyChoice", "photo", "magnifier", "watch", "key"]; /* CHANGE */
+        let current = "alley"; // keep starting on Alley
+
+        const sceneLabel = document.getElementById("sceneLabel");
+
+        function setScene(key) {
+          const all = document.querySelectorAll(".scene");
+          all.forEach(s => s.classList.remove("active"));
+          const el = document.getElementById(`scene-${key}`);
+          if (!el) return;
+          el.classList.add("active");
+          current = key;
+          sceneLabel.textContent = key;
+        }
+
+        function prevScene() {
+          const i = scenes.indexOf(current);
+          const next = (i - 1 + scenes.length) % scenes.length;
+          setScene(scenes[next]);
+        }
+        function nextScene() {
+          const i = scenes.indexOf(current);
+          const next = (i + 1) % scenes.length;
+          setScene(scenes[next]);
+        }
+
+        // Top navigation
+        document.querySelectorAll("[data-goto]").forEach(btn => {
+          btn.addEventListener("click", () => setScene(btn.dataset.goto));
+        });
+
+        // Alley Choice grid uses the same [data-goto] hooks—no extra code needed
+
+        // Toolbar arrows
+        document.getElementById("btn-prev").addEventListener("click", prevScene);
+        document.getElementById("btn-next").addEventListener("click", nextScene);
+
+        // Keyboard shortcuts
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowLeft") prevScene();
+          else if (e.key === "ArrowRight") nextScene();
+          else if (e.key === "1") setScene("intro");
+          else if (e.key === "2") setScene("alley");
+          else if (e.key === "3") setScene("alleyChoice"); /* CHANGE */
+        });
+
+        // Init
+        setScene(current);
+      })();
+    </script>
+    <!-- /CHANGE -->
+  </body>
+</html>
