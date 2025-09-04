@@ -105,10 +105,11 @@ function draw() {
   }
 
   // text not hidden by the "darkness"
+  textAlign(CENTER, CENTER);
   textSize(textSizeVal);
   fill(139, 0, 0);
   noStroke();
-  text("are you there?", 120, 200);
+  text("are you there?", width / 2, height * 0.33);
 
   // cursor image
   if (img) image(img, mouseX, mouseY, 30, 30);
