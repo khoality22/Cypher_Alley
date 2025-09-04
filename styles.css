@@ -28,6 +28,8 @@ body {
   border: 2px solid #ffffff;
   border-radius: 10px;
   width: min(90vw, 820px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .title {
